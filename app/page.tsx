@@ -70,7 +70,7 @@ export default function Home() {
     setError(null);
     try {
       if (typeof window === 'undefined' || !window.crypto || !window.crypto.subtle) {
-        setError('WebCrypto API (crypto.subtle) is required for true zero-knowledge client-side encryption. Please use a modern browser.');
+        setError('WebCrypto API is required for true zero-knowledge client-side encryption. Please use a modern browser.');
         setLoading(false);
         return;
       }
@@ -182,10 +182,10 @@ export default function Home() {
             <ShieldCheck className="w-4 h-4" /> Zero-Knowledge Client-Side Cryptography
           </div>
           <h1 className="text-4xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">
-            <span className="text-cyan-400">WhisperNet</span> One-Time Secret Share
+            <span className="text-cyan-400">Share Secrets.</span> Not Exposure.
           </h1>
           <p className="text-slate-400 max-w-2xl mx-auto text-[17px] leading-relaxed">
-            Powered by client-side AES-256-GCM encryption. Create encrypted messages, share unique links, and control how long your secrets remain available.
+            Create encrypted messages using client-side AES-256-GCM encryption. Share sensitive information through unique links with built-in expiration and self-destruct controls.
           </p>
         </div>
 
@@ -270,7 +270,7 @@ export default function Home() {
                     : 'bg-cyan-400 hover:bg-cyan-300 text-black shadow-[0_0_20px_rgba(34,211,238,0.2)] hover:shadow-[0_0_25px_rgba(34,211,238,0.3)] disabled:opacity-50 disabled:cursor-not-allowed'
                 }`}
               >
-                {loading ? 'Encrypting in Browser...' : result ? 'Encrypted & Locked' : 'Encrypt & Generate Link'}
+                {loading ? 'Encrypting ' : result ? 'Encrypted & Locked' : 'Encrypt & Generate Link'}
               </button>
             </div>
           </div>
