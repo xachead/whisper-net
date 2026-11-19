@@ -333,9 +333,9 @@ export default function Home() {
                   </div>
 
                   <div className="space-y-3 pt-2 text-[14px] shrink-0">
-                    <div className="flex items-center gap-2.5 text-slate-400">
+                    <div className={`flex items-center gap-2.5 ${timeLeft === 'Expired' ? 'text-rose-400 font-medium' : 'text-slate-400'}`}>
                       <Clock className="w-4 h-4" />
-                      <span>Expires in {timeLeft}</span>
+                      <span>{timeLeft === 'Expired' ? 'Expired' : `Expires in ${timeLeft}`}</span>
                     </div>
                     {burnOnRead ? (
                       <div className="flex items-center gap-2.5">
