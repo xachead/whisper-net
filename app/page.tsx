@@ -185,7 +185,7 @@ export default function Home() {
             <span className="text-cyan-400">WhisperNet</span> One-Time Secret Share
           </h1>
           <p className="text-slate-400 max-w-2xl mx-auto text-[17px] leading-relaxed">
-            Encrypt, share, and self-destruct. Encrypted in your browser with AES-256-GCM. The server never sees your plaintext secrets.
+            Powered by client-side AES-256-GCM encryption. Create encrypted messages, share unique links, and control how long your secrets remain available.
           </p>
         </div>
 
