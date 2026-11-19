@@ -1,0 +1,58 @@
+services:
+  whispernet-redis:
+    image: redis:7-alpine
+    container_name: whispernet-redis
+    ports:
+      - "127.0.0.1:6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  whispernet-db:
+    image: postgres:18-alpine
+    container_name: whispernet-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-whispernetdb}
+      POSTGRES_USER: ${POSTGRES_USER:-whispernet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in backend/.env}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    ports:
+      - "127.0.0.1:5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-whispernet} -d ${POSTGRES_DB:-whispernetdb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  whispernet-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: whispernet-backend
+    depends_on:
+      whispernet-db:
+        condition: service_healthy
+      whispernet-redis:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://whispernet-db:5432/${POSTGRES_DB:-whispernetdb}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-whispernet}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in backend/.env}
+      - WHISPERNET_CORS_ALLOWED_ORIGINS=${WHISPERNET_CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      - TRUST_PROXY_HEADERS=${TRUST_PROXY_HEADERS:-false}
+      - REDIS_ENABLED=${REDIS_ENABLED:-true}
+      - REDIS_HOST=whispernet-redis
+      - REDIS_PORT=6379
+      - REDIS_FAIL_CLOSED=${REDIS_FAIL_CLOSED:-true}
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

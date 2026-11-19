@@ -1,0 +1,28 @@
+#!/bin/sh
+# ----------------------------------------------------------------------------
+# Apache Maven Wrapper Executable Network Script
+# ----------------------------------------------------------------------------
+
+set -e
+
+# Determine Maven wrapper base directory
+PRG="$0"
+while [ -h "$PRG" ]; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG=`dirname "$PRG"`/"$link"
+  fi
+done
+MAVEN_PROJECTBASEDIR=`dirname "$PRG"`
+export MAVEN_PROJECTBASEDIR
+
+# Delegate to maven installation if installed, or wrapper jar
+if command -v mvn >/dev/null 2>&1; then
+  exec mvn "$@"
+fi
+
+echo "Maven is not installed on PATH. Please install Maven or run via Docker." >&2
+exit 1
