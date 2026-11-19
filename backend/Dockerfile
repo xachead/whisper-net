@@ -16,6 +16,10 @@ RUN addgroup -S whispernet && adduser -S whispernet -G whispernet
 COPY --from=builder /app/target/whispernet-backend-1.0.0.jar app.jar
 RUN chown whispernet:whispernet app.jar
 
+# Sensible image-level defaults; overridden by runtime environment variables or Compose
+ENV SPRING_PROFILES_ACTIVE=prod \
+    PORT=8080
+
 USER whispernet
 EXPOSE 8080
 

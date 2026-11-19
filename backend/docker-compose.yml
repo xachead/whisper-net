@@ -17,9 +17,9 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-whispernetdb}
       POSTGRES_USER: ${POSTGRES_USER:-whispernet}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in backend/.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-whispernetlocal}
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "127.0.0.1:5432:5432"
     restart: unless-stopped
@@ -40,19 +40,33 @@ services:
       whispernet-redis:
         condition: service_healthy
     ports:
-      - "8080:8080"
+      - "${PORT:-8080}:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://whispernet-db:5432/${POSTGRES_DB:-whispernetdb}
-      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-whispernet}
-      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in backend/.env}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
+      - PORT=${PORT:-8080}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:postgresql://whispernet-db:5432/whispernetdb}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-whispernet}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-whispernetlocal}
+      - HIKARI_MAX_POOL_SIZE=${HIKARI_MAX_POOL_SIZE:-5}
+      - HIKARI_MIN_IDLE=${HIKARI_MIN_IDLE:-1}
       - WHISPERNET_CORS_ALLOWED_ORIGINS=${WHISPERNET_CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
       - TRUST_PROXY_HEADERS=${TRUST_PROXY_HEADERS:-false}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-30}
+      - RATE_LIMIT_WINDOW_SECONDS=${RATE_LIMIT_WINDOW_SECONDS:-60}
       - REDIS_ENABLED=${REDIS_ENABLED:-true}
-      - REDIS_HOST=whispernet-redis
-      - REDIS_PORT=6379
+      - REDIS_HOST=${REDIS_HOST:-whispernet-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - REDIS_USER=${REDIS_USER:-}
+      - REDIS_SSL=${REDIS_SSL:-false}
       - REDIS_FAIL_CLOSED=${REDIS_FAIL_CLOSED:-true}
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:8080/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 25s
 
 volumes:
   postgres_data:

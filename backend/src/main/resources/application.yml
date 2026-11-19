@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   application:
@@ -27,10 +27,7 @@ spring:
 
 whispernet:
   cors:
-    allowed-origins:
-      - "http://localhost:3000"
-      - "http://127.0.0.1:3000"
-      - "http://localhost:5173"
+    allowed-origins: ${WHISPERNET_CORS_ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173}
   rate-limit:
     trust-proxy-headers: ${TRUST_PROXY_HEADERS:false}
     max-requests: ${RATE_LIMIT_MAX_REQUESTS:30}
@@ -39,5 +36,8 @@ whispernet:
       enabled: ${REDIS_ENABLED:false}
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      user: ${REDIS_USER:}
+      ssl: ${REDIS_SSL:false}
       timeout-ms: ${REDIS_TIMEOUT_MS:1000}
       fail-closed: ${REDIS_FAIL_CLOSED:true}
